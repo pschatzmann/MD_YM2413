@@ -1,7 +1,10 @@
 #pragma once
 
 #include <Arduino.h>
+#include "MD_IODriver.h"
+#include "YM2413Emulator.h"
 
+#undef _C
 /**
  * \file
  * \brief Main header file for the MD_YM2413 library
@@ -309,7 +312,11 @@ class MD_YM2413
     * \param we      pin number used as write enable
     * \param a0      pin number used as address/data selector
     */
-    MD_YM2413(const uint8_t* D, uint8_t we, uint8_t a0);
+    MD_YM2413(uint16_t* D, uint8_t we, uint8_t a0);
+
+    MD_YM2413(IOPins pins);
+
+    MD_YM2413(YM2413Emulator &emulator);
 
    /**
     * Class Destructor.
@@ -657,7 +664,7 @@ class MD_YM2413
     channelData_t _C[MAX_CHANNELS];   ///< real-time tracking data for each channel
 
     // Variables
-    const uint8_t* _D; ///< YM2413 IC pins D0-D7 in that order
+    const uint16_t* _D; ///< YM2413 IC pins D0-D7 in that order
     uint8_t _we;       ///< YM2413 write Enable output pin (active low)
     uint8_t _a0;       ///< YM2413 address selector output pin
 
@@ -668,6 +675,10 @@ class MD_YM2413
     static const uint16_t _fNumTable[12];
     static const uint16_t _blockTable[8];
 
+    // IO - default via pins
+    IOPins defaultIO;
+    MD_IODriver *p_io=&defaultIO;
+
     // Methods
     void initChannels(void);
     uint16_t calcFNum(uint16_t freq, uint8_t block);
@@ -675,5 +686,6 @@ class MD_YM2413
     uint8_t buildReg2x(bool susOn, bool keyOn, uint8_t octave, uint16_t fNum);
     uint8_t buildReg0e(bool enable, instrument_t instr, uint8_t keyOn);
     void send(uint8_t addr, uint8_t data);
+    void setupIO();
 };
 

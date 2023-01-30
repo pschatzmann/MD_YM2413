@@ -1,6 +1,6 @@
 # MD_YM2413
 
-[![arduino-library-badge](https://www.ardu-badge.com/badge/MD_YM2413.svg?)](https://www.ardu-badge.com/MD_YM2413)
+This is a ym2413 library which is based on the [MD_YM2413 project](https://github.com/MajicDesigns/MD_YM2413) from MajicDesigns. I have added the [YM2413 Emulator](https://github.com/digital-sound-antiques/emu2413) from digital-sound-antiques and modified the original library to support both: the output to Arduino pins and to the emulator. 
 
 The YM2413, OPLL, is a cost-reduced FM synthesis sound chip manufactured by Yamaha Corporation and based on their YM3812 (OPL2).
 
@@ -10,4 +10,10 @@ Its main historical application was the generation of music and sound effects in
 
 This library implements functions that manage the sound generation interface to the YM2413 IC through a clean API encapsulating the basic functionality provided by the hardware.
 
-[Library Documentation](https://majicdesigns.github.io/MD_YM2413/)
+## Examples
+
+The examples have been extended to output the audio from the Emulator using the AudioTools project.  A AudioKit is used, but you can replace this with any supported output stream class (e.g. I2SStream, AnalogAudioStream...)
+
+## RAM
+
+The emulator uses a lot of RAM, so you need to have e.g. an ESP32 with PSRAM.

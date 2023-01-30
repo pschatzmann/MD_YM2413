@@ -4,16 +4,18 @@
 //
 
 #include <MD_YM2413.h>
+#include <YM2413Emulator.h>
+#include "AudioTools.h"
+#include "AudioLibs/AudioKit.h"
 
 // Hardware Definitions ---------------
-// All the pins directly connected to D0-D7 on the IC, in sequential order 
-// so that pin D_PIN[0] is connected to D0, D_PIN[1] to D1, etc.
-const uint8_t D_PIN[] = { 8, 9, 7, 6, A0, A1, A2, A3 };
-const uint8_t WE_PIN = 5;     // Arduino pin connected to the IC WE pin
-const uint8_t A0_PIN = 4;     // Arduino pin connected to the A0 pin
+YM2413Emulator emulator;
+// Output 
+AudioKitStream kit;
+StreamCopy copier(kit, emulator); // copies sound into i2s (both from kit to filtered or filered to kit are supported)
 
 // Global Data ------------------------
-MD_YM2413 S(D_PIN, WE_PIN, A0_PIN);
+MD_YM2413 S(emulator);
 
 // Code -------------------------------
 void setup(void)
@@ -23,6 +25,14 @@ void setup(void)
 
   S.begin();
   S.setPercussion(true);
+
+  // configure output
+  auto cfg = kit.defaultConfig();
+  cfg.sample_rate = emulator.sampleRate();
+  cfg.channels = emulator.channels();
+  cfg.bits_per_sample = emulator.bitsPerSample();
+  kit.begin(cfg);
+
 }
 
 void loop(void)
@@ -73,4 +83,6 @@ void loop(void)
       }
       break;
   }
+  copier.copy(); // Audio output
+
 }

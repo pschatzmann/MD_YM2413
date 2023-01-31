@@ -219,7 +219,7 @@ public:
       OPLL_patchToDump(patch, dump);
   }
 
-  static void OPLL_getDefaultPatch(int32_t type, int32_t num, OPLL_PATCH *patch){
+  static void getDefaultPatch(int32_t type, int32_t num, OPLL_PATCH *patch){
       OPLL_getDefaultPatch( type,  num, patch);
   }
 

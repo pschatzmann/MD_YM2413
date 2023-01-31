@@ -1,6 +1,9 @@
 <map id="src/MD_YM2413_hw.cpp" name="src/MD_YM2413_hw.cpp">
-<area shape="rect" id="node1" title="Implements hardware related methods." alt="" coords="5,5,171,32"/>
-<area shape="rect" id="node3" href="$_m_d___y_m2413_8h.html" title="Main header file for the MD_YM2413 library." alt="" coords="34,155,141,181"/>
-<area shape="rect" id="node7" href="$_m_d___y_m2413__lib_8h.html" title="Library only definitions for the MD_YM2413 library." alt="" coords="75,80,203,107"/>
-<area shape="rect" id="node5" title=" " alt="" coords="49,229,127,256"/>
+<area shape="rect" id="node1" title="Implements hardware related methods." alt="" coords="55,5,234,32"/>
+<area shape="rect" id="node2" href="$_m_d___y_m2413_8h.html" title="Main header file for the MD_YM2413 library." alt="" coords="87,155,202,181"/>
+<area shape="rect" id="node7" href="$_m_d___y_m2413__lib_8h.html" title="Library only definitions for the MD_YM2413 library." alt="" coords="129,80,267,107"/>
+<area shape="rect" id="node3" href="$_m_d___i_o_driver_8h.html" title="Output to pins or to Emulator." alt="" coords="29,229,145,256"/>
+<area shape="rect" id="node6" title=" " alt="" coords="170,229,237,256"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,304,76,331"/>
+<area shape="rect" id="node5" title=" " alt="" coords="101,304,167,331"/>
 </map>

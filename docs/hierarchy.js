@@ -1,8 +1,10 @@
 var hierarchy =
 [
-    [ "MD_SN76489::adsrEnvelope_t", "struct_m_d___s_n76489_1_1adsr_envelope__t.html", null ],
-    [ "MD_SN76489", "class_m_d___s_n76489.html", [
-      [ "MD_SN76489_Direct", "class_m_d___s_n76489___direct.html", null ],
-      [ "MD_SN76489_SPI", "class_m_d___s_n76489___s_p_i.html", null ]
+    [ "MD_IODriver", "class_m_d___i_o_driver.html", [
+      [ "YM2413Emulator", "class_y_m2413_emulator.html", null ]
+    ] ],
+    [ "MD_YM2413", "class_m_d___y_m2413.html", null ],
+    [ "Stream", "class_stream.html", [
+      [ "YM2413Emulator", "class_y_m2413_emulator.html", null ]
     ] ]
 ];

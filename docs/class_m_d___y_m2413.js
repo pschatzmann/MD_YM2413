@@ -24,7 +24,8 @@ var class_m_d___y_m2413 =
       [ "P_BASS_DRUM", "class_m_d___y_m2413.html#a4baea9c20383d245590e2d9f1c10d6b6a3717ff2362f82f2c35e1274b2143bb6c", null ],
       [ "I_UNDEFINED", "class_m_d___y_m2413.html#a4baea9c20383d245590e2d9f1c10d6b6ad887350c52428bb414ecc4e9d74861d7", null ]
     ] ],
-    [ "MD_YM2413", "class_m_d___y_m2413.html#aa35dd389fb8d125c8baf86c15bc9f449", null ],
+    [ "MD_YM2413", "class_m_d___y_m2413.html#aa774c7292387dc527e3ebd9ee367324f", null ],
+    [ "MD_YM2413", "class_m_d___y_m2413.html#a3f299f07582d8bc3ba7d7b2d1e22e07a", null ],
     [ "~MD_YM2413", "class_m_d___y_m2413.html#a0d760a4bb8fcbbbf8425e0ab5cc0c8f5", null ],
     [ "begin", "class_m_d___y_m2413.html#a5d74b7a6fd6bf25e62f9ec3b14f7d4cb", null ],
     [ "countChannels", "class_m_d___y_m2413.html#a6fee9e00e148365aa11da36865b7d4dd", null ],

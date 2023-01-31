@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['setinstrument_0',['setInstrument',['../class_m_d___y_m2413.html#a1eb6bd79f9bd3763d14fc3ddb29b7983',1,'MD_YM2413']]],
-  ['setpercussion_1',['setPercussion',['../class_m_d___y_m2413.html#aff04cfdc927cee5e9f9e371ce7aae8a7',1,'MD_YM2413']]],
-  ['setsustain_2',['setSustain',['../class_m_d___y_m2413.html#ad6c03b3d8e478b670807542766bdf58d',1,'MD_YM2413']]],
-  ['setvolume_3',['setVolume',['../class_m_d___y_m2413.html#a5b2fc9686600dfc452f670a51e0990bf',1,'MD_YM2413::setVolume(uint8_t chan, uint8_t v)'],['../class_m_d___y_m2413.html#a5c0373ab2aa4a4c0e3391cb9b8cc12b3',1,'MD_YM2413::setVolume(uint8_t v)']]]
+  ['noteoff_96',['noteOff',['../class_m_d___y_m2413.html#a72e24f108a3ee174f65ff634a2972a0d',1,'MD_YM2413']]],
+  ['noteon_97',['noteOn',['../class_m_d___y_m2413.html#a213cb511f7559347bacb967bc9e27f4a',1,'MD_YM2413::noteOn(uint8_t chan, uint16_t freq, uint8_t vol, uint16_t duration=0)'],['../class_m_d___y_m2413.html#a4112f4449ae6e279977cd57fb067c6e1',1,'MD_YM2413::noteOn(uint8_t chan, uint8_t octave, uint8_t note, uint8_t vol, uint16_t duration=0)']]]
 ];

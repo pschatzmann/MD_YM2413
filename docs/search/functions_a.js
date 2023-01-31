@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['_7emd_5fym2413_0',['~MD_YM2413',['../class_m_d___y_m2413.html#a0d760a4bb8fcbbbf8425e0ab5cc0c8f5',1,'MD_YM2413']]]
+  ['peek_99',['peek',['../class_y_m2413_emulator.html#ae3e04f263b99f93191a5d258e2c43d06',1,'YM2413Emulator']]]
 ];

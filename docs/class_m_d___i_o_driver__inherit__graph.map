@@ -1,0 +1,4 @@
+<map id="MD_IODriver" name="MD_IODriver">
+<area shape="rect" id="node1" title="Abstract output API." alt="" coords="19,5,125,32"/>
+<area shape="rect" id="node2" href="$class_y_m2413_emulator.html" title="YM2413 emulator which provdes the methods from the emulator and which implements an Arduino Stream so..." alt="" coords="5,80,139,107"/>
+</map>

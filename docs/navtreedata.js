@@ -25,10 +25,11 @@
 var NAVTREE =
 [
   [ "MD_YM2413 Library", "index.html", [
-    [ "YM2413 Sound Synthesizer Library", "index.html", null ],
+    [ "YM2413 Sound Synthesizer Library", "index.html", "index" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
+      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", null ],
         [ "Functions", "functions_func.html", null ],
@@ -48,7 +49,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_m_d___y_m2413_8cpp.html"
+"_m_d___i_o_driver_8h.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

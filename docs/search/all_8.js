@@ -1,10 +1,6 @@
 var searchData=
 [
-  ['max_5foctave_0',['MAX_OCTAVE',['../class_m_d___y_m2413.html#a0fb3500aadac8cfa56b3b283f46dee6e',1,'MD_YM2413']]],
-  ['md_5fym2413_1',['MD_YM2413',['../class_m_d___y_m2413.html',1,'MD_YM2413'],['../class_m_d___y_m2413.html#aa35dd389fb8d125c8baf86c15bc9f449',1,'MD_YM2413::MD_YM2413()']]],
-  ['md_5fym2413_2ecpp_2',['MD_YM2413.cpp',['../_m_d___y_m2413_8cpp.html',1,'']]],
-  ['md_5fym2413_2eh_3',['MD_YM2413.h',['../_m_d___y_m2413_8h.html',1,'']]],
-  ['md_5fym2413_5fhw_2ecpp_4',['MD_YM2413_hw.cpp',['../_m_d___y_m2413__hw_8cpp.html',1,'']]],
-  ['md_5fym2413_5flib_2eh_5',['MD_YM2413_lib.h',['../_m_d___y_m2413__lib_8h.html',1,'']]],
-  ['min_5foctave_6',['MIN_OCTAVE',['../class_m_d___y_m2413.html#a2e26a3194804e9783b597439f73e4b2c',1,'MD_YM2413']]]
+  ['libdebug_25',['LIBDEBUG',['../_m_d___y_m2413__lib_8h.html#a3b05a1fc748b736ddf0f079843d09789',1,'MD_YM2413_lib.h']]],
+  ['loadinstrument_26',['loadInstrument',['../class_m_d___y_m2413.html#a08e4130ecc42b62c0c0da34ac66714f6',1,'MD_YM2413']]],
+  ['loadinstrumentopl2_27',['loadInstrumentOPL2',['../class_m_d___y_m2413.html#a2fe6a255600bcf93daa4eb68054767ea',1,'MD_YM2413']]]
 ];

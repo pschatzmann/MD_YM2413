@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['libdebug_0',['LIBDEBUG',['../_m_d___y_m2413__lib_8h.html#a3b05a1fc748b736ddf0f079843d09789',1,'MD_YM2413_lib.h']]],
-  ['loadinstrument_1',['loadInstrument',['../class_m_d___y_m2413.html#a08e4130ecc42b62c0c0da34ac66714f6',1,'MD_YM2413']]],
-  ['loadinstrumentopl2_2',['loadInstrumentOPL2',['../class_m_d___y_m2413.html#a2fe6a255600bcf93daa4eb68054767ea',1,'MD_YM2413']]]
+  ['instrument_5ft_22',['instrument_t',['../class_m_d___y_m2413.html#a4baea9c20383d245590e2d9f1c10d6b6',1,'MD_YM2413']]],
+  ['isidle_23',['isIdle',['../class_m_d___y_m2413.html#a694a08e22939a0076948cb762855789a',1,'MD_YM2413']]],
+  ['ispercussion_24',['isPercussion',['../class_m_d___y_m2413.html#a6efe87d5e0ba75cbc803751f052a15be',1,'MD_YM2413::isPercussion(void)'],['../class_m_d___y_m2413.html#a1afd692afb7666bec6f9c81e0d7af0c9',1,'MD_YM2413::isPercussion(uint8_t chan)']]]
 ];

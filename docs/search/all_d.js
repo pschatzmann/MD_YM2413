@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['setinstrument_0',['setInstrument',['../class_m_d___y_m2413.html#a1eb6bd79f9bd3763d14fc3ddb29b7983',1,'MD_YM2413']]],
-  ['setpercussion_1',['setPercussion',['../class_m_d___y_m2413.html#aff04cfdc927cee5e9f9e371ce7aae8a7',1,'MD_YM2413']]],
-  ['setsustain_2',['setSustain',['../class_m_d___y_m2413.html#ad6c03b3d8e478b670807542766bdf58d',1,'MD_YM2413']]],
-  ['setvolume_3',['setVolume',['../class_m_d___y_m2413.html#a5b2fc9686600dfc452f670a51e0990bf',1,'MD_YM2413::setVolume(uint8_t chan, uint8_t v)'],['../class_m_d___y_m2413.html#a5c0373ab2aa4a4c0e3391cb9b8cc12b3',1,'MD_YM2413::setVolume(uint8_t v)']]],
-  ['support_20the_20library_4',['Support the Library',['../page_donation.html',1,'index']]]
+  ['read_43',['read',['../class_y_m2413_emulator.html#aaff95055cb242d6d1894ecdb08e2f253',1,'YM2413Emulator']]],
+  ['readbytes_44',['readBytes',['../class_y_m2413_emulator.html#a92336af34987af35f470a0e0f5b9fd2e',1,'YM2413Emulator']]],
+  ['revision_20history_45',['Revision History',['../page_revision_history.html',1,'index']]],
+  ['run_46',['run',['../class_m_d___y_m2413.html#a3adfd20b47eea60b69b80d94366d5648',1,'MD_YM2413']]]
 ];

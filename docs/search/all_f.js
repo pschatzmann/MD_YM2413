@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['vol_0',['VOL',['../_m_d___y_m2413__lib_8h.html#a6b4f363c69ea65af3b08c42db94d7b3d',1,'MD_YM2413_lib.h']]],
-  ['vol_5fmax_1',['VOL_MAX',['../class_m_d___y_m2413.html#a59ef0109f681e73292823edb016345ac',1,'MD_YM2413']]],
-  ['vol_5foff_2',['VOL_OFF',['../class_m_d___y_m2413.html#a440959c72100f9004f074c8726f3c98e',1,'MD_YM2413']]]
+  ['togglemask_62',['toggleMask',['../class_y_m2413_emulator.html#a18117a539cb5ee934461d5ea2ac1e778',1,'YM2413Emulator']]]
 ];

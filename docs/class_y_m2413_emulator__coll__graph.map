@@ -1,0 +1,5 @@
+<map id="YM2413Emulator" name="YM2413Emulator">
+<area shape="rect" id="node1" title="YM2413 emulator which provdes the methods from the emulator and which implements an Arduino Stream so..." alt="" coords="47,80,181,107"/>
+<area shape="rect" id="node2" href="$class_m_d___i_o_driver.html" title="Abstract output API." alt="" coords="5,5,111,32"/>
+<area shape="rect" id="node3" href="$class_stream.html" title=" " alt="" coords="135,5,205,32"/>
+</map>

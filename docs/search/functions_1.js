@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['countchannels_0',['countChannels',['../class_m_d___y_m2413.html#a6fee9e00e148365aa11da36865b7d4dd',1,'MD_YM2413']]]
+  ['begin_83',['begin',['../class_m_d___y_m2413.html#a5d74b7a6fd6bf25e62f9ec3b14f7d4cb',1,'MD_YM2413']]],
+  ['bitspersample_84',['bitsPerSample',['../class_y_m2413_emulator.html#a340aa193bd87901dfbadb15e2ece0823',1,'YM2413Emulator']]]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['getinstrument_0',['getInstrument',['../class_m_d___y_m2413.html#a8535e5be552b5ce08e3977128e35823f',1,'MD_YM2413']]],
-  ['getvolume_1',['getVolume',['../class_m_d___y_m2413.html#aef374f42c43f7aadb8450868ac7b06a3',1,'MD_YM2413']]]
+  ['countchannels_85',['countChannels',['../class_m_d___y_m2413.html#a6fee9e00e148365aa11da36865b7d4dd',1,'MD_YM2413']]]
 ];

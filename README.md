@@ -17,7 +17,7 @@ This library implements functions that manage the sound generation interface to 
 
 To test the functionality of the Emulator, the examples have been extended to output the audio from the Emulator using the [AudioTools](https://github.com/pschatzmann/arduino-audio-tools) project:  The [AudioKit](https://github.com/pschatzmann/arduino-audiokit) is used as output device, but you can replace this with any supported output stream class (e.g. I2SStream, AnalogAudioStream...)
 
-Because of the limited functionality of the Emulator, however most examples do not work, pr do not sound good. So I recommend to stick with the original functionality and use it togheter with a proper YM2413 chip.
+Because of the limited functionality of the Emulator, however most examples do not work, nor do not sound good. So I recommend to stick with the original functionality and use it togheter with a proper YM2413 chip.
 
 ## RAM
 

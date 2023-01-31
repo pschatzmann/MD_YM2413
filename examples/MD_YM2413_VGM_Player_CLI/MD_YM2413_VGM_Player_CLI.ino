@@ -256,7 +256,7 @@ void handlerHelp(char* param) { CP.help(); }
 
 void setup(void) // This is run once at power on
 {
-  Serial.begin(57600); // For Console I/O
+  Serial.begin(115200); // For Console I/O
   Serial.print(F("\n[MD_SN74689 VGM Player CLI]"));
   Serial.print(F("\nEnsure serial monitor line ending is set to newline."));
 

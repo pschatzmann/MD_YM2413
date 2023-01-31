@@ -471,7 +471,7 @@ const char* SMFErr(int err)
 void setup(void) // This is run once at power on
 {
 #if DEBUG || PRINT_MIDI_STREAM
-  Serial.begin(57600);
+  Serial.begin(115200);
 #endif
   PRINTS("\n[MD_YM2413 Midi Player]");
 

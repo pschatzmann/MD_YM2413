@@ -1,10 +1,34 @@
 #pragma once
 
-#include <Arduino.h>
 #include "MD_IODriver.h"
 #include "YM2413Emulator.h"
 
+#ifdef ARDUINO
+#  include <Arduino.h>
+#else
+#  include <chrono>
+#  define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+#  define pgm_read_word(addr) (*(const unsigned short *)(addr))
+#  define HIGH 1
+#  define LOW 0
+#  define OUTPUT 1
+#  define PROGMEM
+using namespace std::chrono;
+
+// provides the duration in milliseconds since epoch
+inline uint64_t millis() {
+  using namespace std::chrono;
+  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+}
+// do nothing
+inline void delayMicroseconds(int ms){}
+
+#endif
+
+
 #undef _C
+
+
 /**
  * \file
  * \brief Main header file for the MD_YM2413 library
@@ -312,11 +336,9 @@ class MD_YM2413
     * \param we      pin number used as write enable
     * \param a0      pin number used as address/data selector
     */
-    MD_YM2413(uint16_t* D, uint8_t we, uint8_t a0);
+    MD_YM2413(pin_t* D, pin_t we, pin_t a0);
 
-    MD_YM2413(IOPins pins);
-
-    MD_YM2413(YM2413Emulator &emulator);
+    MD_YM2413(MD_IODriver &driver);
 
    /**
     * Class Destructor.
@@ -498,7 +520,7 @@ class MD_YM2413
     *
     * \param chan    channel number on which volume is set [0..countChannels()-1].
     * \param instr   one of the instruments I_* from instrument_t.
-    * \param vol     volume to set for the specified channel in range [VOL_MIN..VOL_MAX].
+    * \param vol     volume to set for the specified channel in range [VOL_OFF..VOL_MAX].
     * \return true if the instrument was set correctly.
     */
     bool setInstrument(uint8_t chan, instrument_t instr, uint8_t vol = VOL_MAX);
@@ -523,7 +545,7 @@ class MD_YM2413
     * Get the current volume for a channel.
     *
     * \param chan  channel number on which volume is set [0..countChannels()-1].
-    * \return the current volume in the range [VOL_MIN..VOL_MAX].
+    * \return the current volume in the range [VOL_OFF..VOL_MAX].
     */
     uint8_t getVolume(uint8_t chan) { return(chan < countChannels() ? _C[chan].vol : 0); }
 
@@ -531,10 +553,10 @@ class MD_YM2413
     * Set the volume for a channel.
     *
     * Set the volume for a channel to be the value specified.
-    * Valid values are all the values in the range [VOL_MIN..VOL_MAX].
+    * Valid values are all the values in the range [VOL_OFF..VOL_MAX].
     *
     * \param chan  channel number on which volume is set [0..countChannels()-1].
-    * \param v     volume to set for the specified channel in range [VOL_MIN..VOL_MAX].
+    * \param v     volume to set for the specified channel in range [VOL_OFF..VOL_MAX].
     */
     void setVolume(uint8_t chan, uint8_t v);
 
@@ -542,9 +564,9 @@ class MD_YM2413
     * Set the volume for all channels.
     *
     * Set the volume for all channels to be the specified value. Valid values are all
-    * the values in the range [VOL_MIN..VOL_MAX].
+    * the values in the range [VOL_OFF..VOL_MAX].
     *
-    * \param v     volume to set for all channels in range [VOL_MIN..VOL_MAX].
+    * \param v     volume to set for all channels in range [VOL_OFF..VOL_MAX].
     */
     void setVolume(uint8_t v);
 
@@ -562,7 +584,7 @@ class MD_YM2413
     *
     * \param chan     channel number on which to play this note [0..countChannels()-1].
     * \param freq     frequency to play.
-    * \param vol     volume to set this note in range [VOL_MIN..VOL_MAX].
+    * \param vol     volume to set this note in range [VOL_OFF..VOL_MAX].
     * \param duration length of time in ms for the whole note to last.
     */
     void noteOn(uint8_t chan, uint16_t freq, uint8_t vol, uint16_t duration = 0);
@@ -586,7 +608,7 @@ class MD_YM2413
     * \param chan    channel number on which to play this note [0..countChannels()-1].
     * \param octave  the octave block for this note [MIN_OCTAVE..MAX_OCTAVE].
     * \param note    the note number to play [0..11] as defined above.
-    * \param vol     volume to set this note in range [VOL_MIN..VOL_MAX].
+    * \param vol     volume to set this note in range [VOL_OFF..VOL_MAX].
     * \param duration length of time in ms for the whole note to last.
     */
     void noteOn(uint8_t chan, uint8_t octave, uint8_t note, uint8_t vol, uint16_t duration = 0);
@@ -603,6 +625,7 @@ class MD_YM2413
     * \param chan    channel number on which to stop this note [0..countChannels()-1].
     */
     void noteOff(uint8_t chan);
+
 
    /** @} */
   private:
@@ -663,21 +686,19 @@ class MD_YM2413
     
     channelData_t _C[MAX_CHANNELS];   ///< real-time tracking data for each channel
 
-    // Variables
-    const uint16_t* _D; ///< YM2413 IC pins D0-D7 in that order
-    uint8_t _we;       ///< YM2413 write Enable output pin (active low)
-    uint8_t _a0;       ///< YM2413 address selector output pin
+    // // Variables
+    // const pin_t* _D; ///< YM2413 IC pins D0-D7 in that order
+    // pin_t _we;       ///< YM2413 write Enable output pin (active low)
+    // pin_t _a0;       ///< YM2413 address selector output pin
 
     bool _enablePercussion;   ///< true if percussion instruments are enabled
-    uint8_t _lastAddress;     ///< used by send() to remember the last address and not repeat send if same
 
     // External static data
     static const uint16_t _fNumTable[12];
     static const uint16_t _blockTable[8];
 
     // IO - default via pins
-    IOPins defaultIO;
-    MD_IODriver *p_io=&defaultIO;
+    MD_IODriver *p_io=nullptr;
 
     // Methods
     void initChannels(void);
@@ -686,6 +707,5 @@ class MD_YM2413
     uint8_t buildReg2x(bool susOn, bool keyOn, uint8_t octave, uint16_t fNum);
     uint8_t buildReg0e(bool enable, instrument_t instr, uint8_t keyOn);
     void send(uint8_t addr, uint8_t data);
-    void setupIO();
 };
 

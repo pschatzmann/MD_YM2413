@@ -15,6 +15,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+
+// Platform specific memory allocation
+#if defined(ESP32) && defined(ARDUINO)
+#  include "Arduino.h"
+#  undef BIT
+#  ifndef BOARD_HAS_PSRAM
+#    error("Please activate PSRAM")
+#  endif
+#else
+#  define ps_malloc(X) malloc(X)
+#endif
+
 
 #ifndef INLINE
 #if defined(_MSC_VER)
@@ -27,11 +40,8 @@
 #endif
 
 #define _PI_ 3.14159265358979323846264338327950288
-
-// use PSRAM on ESP32
-#ifdef ESP32
-#  define malloc(X) ps_malloc(X)
-#endif
+#define TRUE 1
+#define FALSE 0
 
 #define OPLL_TONE_NUM 3
 /* clang-format off */
@@ -222,16 +232,25 @@ static const uint32_t ml_table[16] = {1,     1 * 2, 2 * 2,  3 * 2,  4 * 2,  5 * 
 static const float kl_table[16] = {dB2(0.000),  dB2(9.000),  dB2(12.000), dB2(13.875), dB2(15.000), dB2(16.125),
                               dB2(16.875), dB2(17.625), dB2(18.000), dB2(18.750), dB2(19.125), dB2(19.500),
                               dB2(19.875), dB2(20.250), dB2(20.625), dB2(21.000)};
-static const tll_x = 128;
-static const tll_y = 64;
-static const tll_z = 4;
+static const int tll_x = 128;
+static const int tll_y = 64;
+static const int tll_z = 4;
+#if DYNAMIC_ALLOCATUIN_HACK
 static uint32_t *tll_table=NULL; //[8 * 16][1 << TL_BITS][4]; // 4*128*64*4 = 131072 bytes
+#else
+static uint32_t tll_table[8 * 16][1 << TL_BITS][4]; // 4*128*64*4 = 131072 bytes
+#endif
+
 static int32_t rks_table[8 * 2][2];
 
 static OPLL_PATCH null_patch = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-static const patch_x = OPLL_TONE_NUM;
-static const patch_y = (16 + 3) * 2;
+static const int patch_x = OPLL_TONE_NUM;
+static const int patch_y = (16 + 3) * 2;
+#if DYNAMIC_ALLOCATUIN_HACK
 static OPLL_PATCH *default_patch=NULL;//[OPLL_TONE_NUM][(16 + 3) * 2];
+#else
+static OPLL_PATCH default_patch[OPLL_TONE_NUM][(16 + 3) * 2];
+#endif
 
 /* don't forget min/max is defined as a macro in stdlib.h of Visual C. */
 #ifndef min
@@ -240,6 +259,24 @@ static INLINE int min(int i, int j) { return (i < j) ? i : j; }
 #ifndef max
 static INLINE int max(int i, int j) { return (i > j) ? i : j; }
 #endif
+
+// ps ram initilaization
+static void initPSRam(){
+#ifdef BOARD_HAS_PSRAM
+    if(psramInit()){
+        printf("The PSRAM is correctly initialized\n");
+    }else{
+        printf("PSRAM does not work\n");
+    }
+#endif
+}
+
+/// Central memory allocation
+static void* malloc2413(int size, char fast) { 
+  void *result = fast ? malloc(size) : ps_malloc(size);
+  printf("malloc(%d, %d) -> 0x%X \n", size, fast, result);
+  return result;
+}
 
 /***************************************************
 
@@ -257,31 +294,36 @@ static INLINE int max(int i, int j) { return (i > j) ? i : j; }
  */
 #define LW 16
 
+
 /* resolution of sinc(x) table. sinc(x) where 0.0<=x<1.0 corresponds to sinc_table[0...SINC_RESO-1] */
 #define SINC_RESO 256
 #define SINC_AMP_BITS 12
 
 // double hamming(double x) { return 0.54 - 0.46 * cos(2 * PI * x); }
-static double blackman(double x) { return 0.42 - 0.5 * cos(2 * _PI_ * x) + 0.08 * cos(4 * _PI_ * x); }
-static double sinc(double x) { return (x == 0.0 ? 1.0 : sin(_PI_ * x) / (_PI_ * x)); }
-static double windowed_sinc(double x) { return blackman(0.5 + 0.5 * x / (LW / 2)) * sinc(x); }
+static float blackman(float x) { return 0.42 - 0.5 * cos(2 * _PI_ * x) + 0.08 * cos(4 * _PI_ * x); }
+static float sinc(float x) { return (x == 0.0 ? 1.0 : sin(_PI_ * x) / (_PI_ * x)); }
+static float windowed_sinc(float x) { return blackman(0.5 + 0.5 * x / (LW / 2)) * sinc(x); }
 
 /* f_inp: input frequency. f_out: output frequencey, ch: number of channels */
-OPLL_RateConv *OPLL_RateConv_new(double f_inp, double f_out, int ch) {
-  OPLL_RateConv *conv = malloc(sizeof(OPLL_RateConv));
+OPLL_RateConv *OPLL_RateConv_new(float f_inp, float f_out, int ch) {
+  OPLL_RateConv *conv = malloc2413(sizeof(OPLL_RateConv), FALSE);
+  assert(conv!=NULL);
   int i;
 
   conv->ch = ch;
   conv->f_ratio = f_inp / f_out;
-  conv->buf = malloc(sizeof(void *) * ch);
+  conv->buf = malloc2413(sizeof(void *) * ch, FALSE);
+  assert(conv->buf!=NULL);
   for (i = 0; i < ch; i++) {
-    conv->buf[i] = malloc(sizeof(conv->buf[0][0]) * LW);
+    conv->buf[i] = malloc2413(sizeof(conv->buf[0][0]) * LW, FALSE);
+    assert(conv->buf[i]!=NULL);
   }
 
   /* create sinc_table for positive 0 <= x < LW/2 */
-  conv->sinc_table = malloc(sizeof(conv->sinc_table[0]) * SINC_RESO * LW / 2);
+  conv->sinc_table = malloc2413(sizeof(conv->sinc_table[0]) * SINC_RESO * LW / 2, FALSE);
+  assert(conv->sinc_table!=NULL);
   for (i = 0; i < SINC_RESO * LW / 2; i++) {
-    const double x = (double)i / SINC_RESO;
+    const float x = (float)i / SINC_RESO;
     if (f_out < f_inp) {
       /* for downsampling */
       conv->sinc_table[i] = (int16_t)((1 << SINC_AMP_BITS) * windowed_sinc(x / conv->f_ratio) / conv->f_ratio);
@@ -294,7 +336,7 @@ OPLL_RateConv *OPLL_RateConv_new(double f_inp, double f_out, int ch) {
   return conv;
 }
 
-static INLINE int16_t lookup_sinc_table(int16_t *table, double x) {
+static INLINE int16_t lookup_sinc_table(int16_t *table, float x) {
   int16_t index = (int16_t)(x * SINC_RESO);
   if (index < 0)
     index = -index;
@@ -325,13 +367,13 @@ int16_t OPLL_RateConv_getData(OPLL_RateConv *conv, int ch) {
   int16_t *buf = conv->buf[ch];
   int32_t sum = 0;
   int k;
-  double dn;
+  float dn;
   conv->timer += conv->f_ratio;
   dn = conv->timer - floor(conv->timer);
   conv->timer = dn;
 
   for (k = 0; k < LW; k++) {
-    double x = ((double)k - (LW / 2 - 1)) - dn;
+    float x = ((float)k - (LW / 2 - 1)) - dn;
     sum += buf[k] * lookup_sinc_table(conv->sinc_table, x);
   }
   return sum >> SINC_AMP_BITS;
@@ -371,16 +413,23 @@ static void makeSinTable(void) {
     halfsin_table[x] = 0xfff;
 }
 
+#if DYNAMIC_ALLOCATUIN_HACK
 static uint32_t *tll_table_ptr(int i, int j, int k){
   return tll_table + (i * tll_y * tll_z) + (j * tll_z) + k;
 }
+#endif
 
 static void makeTllTable(void) {
 
+#if DYNAMIC_ALLOCATUIN_HACK
   if (tll_table==NULL){
-    tll_table = (uint32_t *) malloc(sizeof(uint32_t)*tll_x*tll_y*tll_z);
+
+    initPSRam();
+
+    tll_table = (uint32_t *) malloc2413(sizeof(uint32_t)*tll_x*tll_y*tll_z, TRUE);
   }
   assert(tll_table!=NULL);
+#endif
 
   int32_t tmp;
   int32_t fnum, block, TL, KL;
@@ -390,17 +439,26 @@ static void makeTllTable(void) {
       for (TL = 0; TL < 64; TL++) {
         for (KL = 0; KL < 4; KL++) {
           if (KL == 0) {
-            //tll_table[(block << 4) | fnum][TL][KL] = TL2EG(TL);
-            *tll_table_ptr((block << 4) | fnum, TL, KL) =  TL2EG(TL);
+              #if DYNAMIC_ALLOCATUIN_HACK
+                *tll_table_ptr((block << 4) | fnum, TL, KL) =  TL2EG(TL);
+              #else
+                tll_table[(block << 4) | fnum][TL][KL] = TL2EG(TL);
+              #endif
           } else {
-            tmp = (int32_t)(kl_table[fnum] - dB2(3.000) * (7 - block));
+            tmp = (int32_t)(kl_table[fnum] - dB2(3.000f) * (7 - block));
             if (tmp <= 0)
-              //tll_table[(block << 4) | fnum][TL][KL] = TL2EG(TL);
-              *tll_table_ptr((block << 4) | fnum, TL, KL) =  TL2EG(TL);
+              #if DYNAMIC_ALLOCATUIN_HACK
+                *tll_table_ptr((block << 4) | fnum, TL, KL) =  TL2EG(TL);
+              #else
+                tll_table[(block << 4) | fnum][TL][KL] = TL2EG(TL);
+              #endif
 
             else{
-              //tll_table[(block << 4) | fnum][TL][KL] = (uint32_t)((tmp >> (3 - KL)) / EG_STEP) + TL2EG(TL);
-              *tll_table_ptr((block << 4) | fnum, TL, KL) = (uint32_t)((tmp >> (3 - KL)) / EG_STEP) + TL2EG(TL);
+              #if DYNAMIC_ALLOCATUIN_HACK
+                *tll_table_ptr((block << 4) | fnum, TL, KL) = (uint32_t)((tmp >> (3 - KL)) / EG_STEP) + TL2EG(TL);
+              #else
+                tll_table[(block << 4) | fnum][TL][KL] = (uint32_t)((tmp >> (3 - KL)) / EG_STEP) + TL2EG(TL);
+              #endif
             }
 
           }
@@ -419,22 +477,28 @@ static void makeRksTable(void) {
     }
 }
 
+#if DYNAMIC_ALLOCATUIN_HACK
 INLINE static OPLL_PATCH* default_patch_ptr(int i, int j){
-  return default_patch + i * patch_y *  j;
+  return default_patch + (i * patch_y) +  j;
 }
+#endif
 
 static void makeDefaultPatch(void) {
+#if DYNAMIC_ALLOCATUIN_HACK
   if (default_patch==NULL){
-    default_patch = malloc(sizeof(OPLL_PATCH)*patch_x*patch_y);
+    default_patch = (OPLL_PATCH*) malloc2413(sizeof(OPLL_PATCH)*patch_x*patch_y, TRUE);
   }
   assert(default_patch!=NULL);
+#endif
 
   int i, j;
   for (i = 0; i < OPLL_TONE_NUM; i++)
     for (j = 0; j < 19; j++){
-      //OPLL_getDefaultPatch(i, j, &default_patch[i][j * 2]);
-      OPLL_getDefaultPatch(i, j, default_patch_ptr(i,j * 2));
-
+      #if DYNAMIC_ALLOCATUIN_HACK
+        OPLL_getDefaultPatch(i, j, default_patch_ptr(i,j * 2));
+      #else
+        OPLL_getDefaultPatch(i, j, &default_patch[i][j * 2]);
+      #endif
     }
 }
 static uint8_t table_initialized = 0;
@@ -547,18 +611,28 @@ static void commit_slot_update(OPLL_SLOT *slot) {
 #endif
 
   if (slot->update_requests & UPDATE_WS) {
-    slot->wave_table = wave_table_map[slot->patch->WS];
+    slot->wave_table = (uint16_t *)wave_table_map[slot->patch->WS];
   }
 
+#if DYNAMIC_ALLOCATUIN_HACK
   if (slot->update_requests & UPDATE_TLL) {
     if ((slot->type & 1) == 0) {
-      //slot->tll = tll_table[slot->blk_fnum >> 5][slot->patch->TL][slot->patch->KL];
       slot->tll = *tll_table_ptr(slot->blk_fnum >> 5,slot->patch->TL,slot->patch->KL);
     } else {
-      //slot->tll = tll_table[slot->blk_fnum >> 5][slot->volume][slot->patch->KL];
       slot->tll = *tll_table_ptr(slot->blk_fnum >> 5,slot->volume,slot->patch->KL);
     }
   }
+#else
+  if (slot->update_requests & UPDATE_TLL) {
+    if ((slot->type & 1) == 0) {
+      slot->tll = tll_table[slot->blk_fnum >> 5][slot->patch->TL][slot->patch->KL];
+    } else {
+      slot->tll = tll_table[slot->blk_fnum >> 5][slot->volume][slot->patch->KL];
+    }
+  }
+
+#endif
+
 
   if (slot->update_requests & UPDATE_RKS) {
     slot->rks = rks_table[slot->blk_fnum >> 8][slot->patch->KR];
@@ -590,7 +664,7 @@ static void reset_slot(OPLL_SLOT *slot, int number) {
   slot->number = number;
   slot->type = number % 2;
   slot->pg_keep = 0;
-  slot->wave_table = wave_table_map[0];
+  slot->wave_table = (uint16_t *)wave_table_map[0];
   slot->pg_phase = 0;
   slot->output[0] = 0;
   slot->output[1] = 0;
@@ -1153,8 +1227,8 @@ void OPLL_delete(OPLL *opll) {
 }
 
 static void reset_rate_conversion_params(OPLL *opll) {
-  const double f_out = opll->rate;
-  const double f_inp = opll->clk / 72.0;
+  const float f_out = opll->rate;
+  const float f_inp = opll->clk / 72.0;
 
   opll->out_time = 0;
   opll->out_step = f_inp;
@@ -1486,8 +1560,11 @@ void OPLL_copyPatch(OPLL *opll, int32_t num, OPLL_PATCH *patch) {
 void OPLL_resetPatch(OPLL *opll, uint8_t type) {
   int i;
   for (i = 0; i < 19 * 2; i++){
-    //OPLL_copyPatch(opll, i, &default_patch[type % OPLL_TONE_NUM][i]);
-    OPLL_copyPatch(opll, i, default_patch_ptr(type % OPLL_TONE_NUM,i));
+    #if DYNAMIC_ALLOCATUIN_HACK
+      OPLL_copyPatch(opll, i, default_patch_ptr(type % OPLL_TONE_NUM,i));
+    #else
+      OPLL_copyPatch(opll, i, &default_patch[type % OPLL_TONE_NUM][i]);
+    #endif
   }
 
 }

@@ -1,13 +1,24 @@
 #pragma once
-
-#include "Stream.h"
+#include <stdio.h>
+#include <stdint.h>
+#include <assert.h>
+#include "MD_YM2413.h"
 #include "MD_IODriver.h"
 #include "emu2413/emu2413.h"
+
 #define MSX_CLK 3579545
-#define SAMPLERATE 44100
+#define SAMPLERATE 8000
+//44100
+
+#ifdef ARDUINO
+#  include "Stream.h"
+#else
+// dummy class
+class Stream{};
+#endif
 
 /**
- * @brief YM2413 emulator which provdes the methos from the emulator and 
+ * @brief YM2413 emulator which provdes the methods from the emulator and 
  * which implements an Arduino Stream so that the
  * generated sound can be read via readBytes().
  * 
@@ -16,54 +27,47 @@
  */
 class YM2413Emulator : public MD_IODriver, public Stream {
 public:
-  YM2413Emulator(uint32_t sampleRate = SAMPLERATE, int clock = MSX_CLK){
-    // setup data pins
-    sample_rate = sampleRate;
+  YM2413Emulator(uint32_t sampleRate = SAMPLERATE, uint64_t clock = MSX_CLK){
+    this->sample_rate = sampleRate;
+    this->clock = clock;
+    // setup data pins to make them available to MD_YM2413
     we = WE;
     a0 = A0;
+    D = new pin_t[8];
     for (int j=0;j<8;j++){
       D[j] = j;
     }
     // setup opll
-    p_opll = OPLL_new(clock, sampleRate);
-    OPLL_reset(p_opll);
   }
 
   ~YM2413Emulator(){
-    OPLL_delete(p_opll);
+    if (p_opll) OPLL_delete(p_opll);
+    delete[] D;
   }
 
-  /// Sets the mode for the output pin - does nothing!
-  void setMode(uint16_t pin, int function) override{}
-
-  /// @brief Updates the status of the indicated pin (=function)
-  /// @param pin 
-  /// @param status 
-  void write(uint16_t pin, bool status)override{
-    // latch output when we is moving from low to high
-    bool latch = (pin==we && status && !values[pin]);
-    // update pin value
-    values[pin] = status;
-    if (latch){
-      uint8_t value = D[7]<<7 | D[6]<<6 | D[5]<<5 | D[4]<<4 | D[3]<<3 | D[2]<<2 | D[1]<<1 | D[0];
-      if (values[A0]){
-        // content
-        writeReg(address, value);
-      } else {
-        // address
-        address = value;
-      }
+  void begin() {
+    if (p_opll==nullptr){
+      p_opll = OPLL_new(clock, sample_rate);
+    //OPLL_reset(p_opll);
     }
   }
 
+  void send(uint8_t addr, uint8_t data){
+      printf("writeReg(%X, %X)\n", addr, data);
+      writeReg(addr, data);
+  }
+  
+  // number of output channels (1 = mono, 2=stereo) of audio result
   uint8_t channels() {
     return 2;
   }
 
+  /// Bits per sample of audio result
   uint32_t bitsPerSample() {
-    return sizeof(int32_t)*8;
+    return sizeof(int16_t)*8;
   }
 
+  /// Sample Rate audo audio output result
   uint32_t sampleRate() {
     return sample_rate;
   }
@@ -125,15 +129,24 @@ public:
       OPLL_setChipType(p_opll,  type);
   }
 
+  /**
+   * Writes a register or value 
+  */
   void writeIO(uint32_t reg, uint8_t val){
       OPLL_writeIO(p_opll,  reg,  val);
 
   }
 
+  /**
+   * Updates a register with the indicated value
+  */
   void writeReg( uint32_t reg, uint8_t val){
       OPLL_writeReg(p_opll,  reg,  val);
   }
 
+  /**
+   * Defines the actual patch
+  */
   void setPatch(const uint8_t *dump){
       OPLL_setPatch(p_opll, dump);
   }
@@ -178,12 +191,24 @@ public:
   /// @brief Calculates the next stereo samples ()
   /// @param out 
   void getSamplesStereo(int32_t *out) {
+    if (p_opll==nullptr){
+      out[0]=0;
+      out[1]=0;
+      printf("p_opll is null!\n");
+      return;
+    }
     OPLL_calcStereo(p_opll, out);
   }
 
   /// @brief  Provides a pointer to the OPLL object
   OPLL *opll() {
     return p_opll;
+  }
+
+  /// @brief  The default volume might be too low, we allow to boost the volume by a defined factor
+  /// @param multiplier 
+  void setBoost(uint8_t multiplier){
+    boost = multiplier;
   }
 
   static void dumpToPatch(const uint8_t *dump, OPLL_PATCH *patch){
@@ -203,37 +228,56 @@ public:
     return 1024;
   }
 
+  /**
+   * Returns the audio data as byte stream
+  */
   size_t readBytes(uint8_t*buffer, size_t len){
-    int frames = len / sizeof(int32_t) / 2;
+    int frames = len / sizeof(int16_t) / 2;
     int32_t out[2];
-    int32_t *data = (int32_t*)buffer;
+    int16_t *data = (int16_t*)buffer;
     int pos=0;
+    has_sound = false;
     for (int j=0;j<frames;j++){
       getSamplesStereo(out);
       for (int ch=0;ch<2;ch++){
+        int32_t tmp = out[ch]*boost;
+        assert(tmp>=-32768);
+        assert(tmp<=32767);
+        if (tmp!=0){
+          has_sound = true;
+        }
         data[pos++] = out[ch];
       }
     }
-    return pos*sizeof(int32_t);
+    return pos*sizeof(int16_t);
   }
 
+  bool hasSound() {
+    return has_sound;
+  }
+
+  /// Write is not supported!
   int availableForWrite(){
     return 0;
   }
+  /// Write is not supported!
   size_t write(uint8_t) {return 0; }
+  /// Read of single bytes is not supported!
   int read() {return -1;};
+  /// Read of single bytes is not supported!
   int peek() {return -1;}
 
 
 protected:
-  enum Functions { D0,D1,D2,D3,P4,D5,D7,WE,A0};
   friend class MD_YM2413;
-  uint16_t D[8];
-  uint8_t we; 
-  uint8_t a0;
+  enum Functions { D0=0,D1,D2,D3,P4,D5,D7,WE,A0};
+  const char *pinNames[9] = {"D0","D1","D2","D3","P4","D5","D7","WE","A0"};
   uint8_t values[9];
-  OPLL *p_opll;
+  OPLL *p_opll = nullptr;
   uint8_t address = 0;
   uint32_t sample_rate =0;
+  uint64_t clock = 0;
+  uint8_t boost = 7;
+  bool has_sound = false;
 
 };

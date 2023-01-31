@@ -7,7 +7,15 @@
 extern "C" {
 #endif
 
-#define OPLL_DEBUG 0
+// Print debug messages
+#ifndef OPLL_DEBUG
+#  define OPLL_DEBUG 0
+#endif
+
+// Allocate big dynamic tables dynamically = 1, or statically = 0;
+#ifndef DYNAMIC_ALLOCATUIN_HACK
+#  define DYNAMIC_ALLOCATUIN_HACK 1
+#endif
 
 enum OPLL_TONE_ENUM { OPLL_2413_TONE = 0, OPLL_VRC7_TONE = 1, OPLL_281B_TONE = 2 };
 
@@ -72,13 +80,13 @@ typedef struct __OPLL_SLOT {
 /* rate conveter */
 typedef struct __OPLL_RateConv {
   int ch;
-  double timer;
-  double f_ratio;
+  float timer;
+  float f_ratio;
   int16_t *sinc_table;
   int16_t **buf;
 } OPLL_RateConv;
 
-OPLL_RateConv *OPLL_RateConv_new(double f_inp, double f_out, int ch);
+OPLL_RateConv *OPLL_RateConv_new(float f_inp, float f_out, int ch);
 void OPLL_RateConv_reset(OPLL_RateConv *conv);
 void OPLL_RateConv_putData(OPLL_RateConv *conv, int ch, int16_t data);
 int16_t OPLL_RateConv_getData(OPLL_RateConv *conv, int ch);
@@ -92,9 +100,9 @@ typedef struct __OPLL {
 
   uint32_t adr;
 
-  double inp_step;
-  double out_step;
-  double out_time;
+  float inp_step;
+  float out_step;
+  float out_time;
 
   uint8_t reg[0x40];
   uint8_t test_flag;

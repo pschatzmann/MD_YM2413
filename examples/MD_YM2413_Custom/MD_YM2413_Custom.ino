@@ -147,7 +147,7 @@ void handlerHelp(char* param) { CP.help(); }
 
 void setup(void)
 {
-  Serial.begin(57600);
+  Serial.begin(115200);
   S.begin();
   S.setVolume(CHANNEL, volume);
   S.setInstrument(CHANNEL, MD_YM2413::I_CUSTOM);

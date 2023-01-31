@@ -20,7 +20,7 @@ MD_YM2413 S(emulator);
 // Code -------------------------------
 void setup(void)
 {
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.println(F("\n[MD_YM2413 Percussion Tester]"));
 
   S.begin();

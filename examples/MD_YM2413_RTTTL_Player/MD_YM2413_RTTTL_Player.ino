@@ -70,7 +70,7 @@ void RTTTLhandler(uint8_t octave, uint8_t noteId, uint32_t duration, bool activa
 
 void setup(void)
 {
-  Serial.begin(57600);
+  Serial.begin(115200);
   PRINTS("\n[MD_YM2413 RTTL Player]");
 
   P.begin();

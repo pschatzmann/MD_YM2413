@@ -30,7 +30,7 @@ MD_MusicTable T;
 // Code -------------------------------
 void setup(void)
 {
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.println(F("\n[MD_YM2413 Note Tester]"));
 
   S.begin();

@@ -101,39 +101,7 @@ uint8_t MD_YM2413::buildReg0e(bool enable, instrument_t instr, uint8_t keyOn)
 
 void MD_YM2413::send(uint8_t addr, uint8_t data)
 {
-  // From the datasheet
-  //  /WE A0
-  //   1  x  = Write inhibited
-  //   0  0  = Write register address
-  //   0  1  = Write register content 
-
-  //DEBUGS("\nsend");
-
-  if (_lastAddress != addr)
-  {
-    //DEBUGX(" A 0x", addr);
-    // write register address
-    digitalWrite(_a0, LOW);
-    for (uint8_t i = 0; i < DATA_BITS; i++)
-      digitalWrite(_D[i], (addr & (1 << i)) ? HIGH : LOW);
-
-    // Toggle !WE LOW then HIGH to latch it in the IC
-    // wait for 12 master clock cycles (@3.6Mhz ~ 4us)
-    digitalWrite(_we, LOW);
-    delayMicroseconds(4);
-    digitalWrite(_we, HIGH);
-
-    _lastAddress = addr;    // remember for next time
-  }
-
-  //DEBUGX(" D 0x", data);
-  digitalWrite(_a0, HIGH);
-  for (uint8_t i = 0; i < DATA_BITS; i++)
-    digitalWrite(_D[i], (data & (1 << i)) ? HIGH : LOW);
-
-  // Toggle !WE LOW then HIGH to latch it in the IC
-  // wait for 84 master clock cycles (@3.6Mhz ~ 25us)
-  digitalWrite(_we, LOW);
-  delayMicroseconds(25);
-  digitalWrite(_we, HIGH);
+  p_io->send(addr, data);
 }
+
+

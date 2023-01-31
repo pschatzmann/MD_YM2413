@@ -13,17 +13,19 @@
 #include <SdFat.h>
 #include <MD_YM2413.h>
 #include <MD_cmdProcessor.h>
+#include <YM2413Emulator.h>
+#include "AudioTools.h"
+#include "AudioLibs/AudioKit.h"
 
 #define SHOW_MORE_INFO 1   // set to 1 to show all more info while running
 
 const uint8_t DEFAULT_LOOP_REPEAT = 1;  // number of time to repeat loops by default
 
 // Hardware Definitions ---------------
-// All the pins directly connected to D0-D7 on the IC, in sequential order 
-// so that pin D_PIN[0] is connected to D0, D_PIN[1] to D1, etc.
-const uint8_t D_PIN[] = { 8, 9, 7, 6, A0, A1, A2, A3 };
-const uint8_t WE_PIN = 5;     // Arduino pin connected to the IC WE pin
-const uint8_t A0_PIN = 4;     // Arduino pin connected to the A0 pin
+YM2413Emulator emulator;
+// Output 
+AudioKitStream kit;
+StreamCopy copier(kit, emulator); // copies sound into i2s (both from kit to filtered or filered to kit are supported)
 
 // SD chip select pin for SPI comms.
 const uint8_t SD_SELECT = 10;
@@ -35,7 +37,7 @@ const uint16_t SAMPLE_uS = 23; // 1e6 us/sec at 44100 samples/sec = 22.67us per 
 // Global Data ------------------------
 SdFat SD;
 SdFile FD;    // file descriptor
-MD_YM2413 S(D_PIN, WE_PIN, A0_PIN);
+MD_YM2413 S(emulator);
 
 uint32_t dataOffset = 0;    // offset to start of music data in VGM file
 bool playingVGM = false;    // flag true when in playing mode
@@ -254,7 +256,7 @@ void handlerHelp(char* param) { CP.help(); }
 
 void setup(void) // This is run once at power on
 {
-  Serial.begin(57600); // For Console I/O
+  Serial.begin(115200); // For Console I/O
   Serial.print(F("\n[MD_SN74689 VGM Player CLI]"));
   Serial.print(F("\nEnsure serial monitor line ending is set to newline."));
 
@@ -272,6 +274,13 @@ void setup(void) // This is run once at power on
   // initialise command processor
   CP.begin();
 
+  // configure output
+  auto cfg = kit.defaultConfig();
+  cfg.sample_rate = emulator.sampleRate();
+  cfg.channels = emulator.channels();
+  cfg.bits_per_sample = emulator.bitsPerSample();
+  kit.begin(cfg);
+
   // show the available commands
   handlerHelp(nullptr);
 }
@@ -282,4 +291,7 @@ void loop(void)
     playVGM();
   // else
     CP.run();  // process the User Interface
+    
+    copier.copy(); // Audio output
+
 }

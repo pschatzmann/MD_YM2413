@@ -13,6 +13,9 @@
 #include <MD_YM2413.h>
 #include <MD_MusicTable.h>
 #include "MD_YM2413_MIDI_Map.h"
+#include <YM2413Emulator.h>
+#include "AudioTools.h"
+#include "AudioLibs/AudioKit.h"
 
 #define DEBUG 0               // flag to turn on general debug
 #define PRINT_MIDI_STREAM 0   // flag to print the real time midi stream
@@ -65,11 +68,11 @@ static const char PROGMEM PLAYLIST[][FILE_NAME_SIZE] =
 };
 
 // Hardware Definitions ---------------
-// All the pins directly connected to D0-D7 on the IC, in sequential order 
-// so that pin D_PIN[0] is connected to D0, D_PIN[1] to D1, etc.
-const uint8_t D_PIN[] = { 8, 9, 7, 6, A0, A1, A2, A3 };
-const uint8_t WE_PIN = 5;     // Arduino pin connected to the IC WE pin
-const uint8_t A0_PIN = 4;     // Arduino pin connected to the A0 pin
+YM2413Emulator emulator;
+
+// Output 
+AudioKitStream kit;
+StreamCopy copier(kit, emulator); // copies sound into i2s (both from kit to filtered or filered to kit are supported)
 
 const uint8_t MAX_MIDI_CHANNEL = 24;
 const uint8_t MAX_MIDI_VOICE = 11;
@@ -81,7 +84,7 @@ const uint8_t SD_SELECT = 10;
 SdFat SD;
 MD_MIDIFile SMF;
 MD_MusicTable T;
-MD_YM2413 S(D_PIN, WE_PIN, A0_PIN);
+MD_YM2413 S(emulator);
 
 // Define what a channel the instrument it plays 
 // and the volume at which it plays. The channel number
@@ -468,7 +471,7 @@ const char* SMFErr(int err)
 void setup(void) // This is run once at power on
 {
 #if DEBUG || PRINT_MIDI_STREAM
-  Serial.begin(57600);
+  Serial.begin(115200);
 #endif
   PRINTS("\n[MD_YM2413 Midi Player]");
 
@@ -490,6 +493,14 @@ void setup(void) // This is run once at power on
   SMF.begin(&SD);
   SMF.setMidiHandler(midiCallback);
   midiSilence(); // Silence any hanging notes
+
+  // configure output
+  auto cfg = kit.defaultConfig();
+  cfg.sample_rate = emulator.sampleRate();
+  cfg.channels = emulator.channels();
+  cfg.bits_per_sample = emulator.bitsPerSample();
+  kit.begin(cfg);
+
 }
 
 void loop(void)
@@ -560,10 +571,12 @@ void loop(void)
     timeStart = millis();
     state = IDLE;
   }
-  break;
+  break;be
 
   default:
     state = IDLE;
     break;
   }
+  copier.copy(); // Audio output
+
 }

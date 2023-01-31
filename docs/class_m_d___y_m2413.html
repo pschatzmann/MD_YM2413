@@ -410,7 +410,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>CH_BD
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the current volume in the range [VOL_MIN..VOL_MAX]. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the current volume in the range [VOL_OFF..VOL_MAX]. </dd></dl>
 
 </div>
 </div>
@@ -630,7 +630,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>CH_BD
   <table class="params">
     <tr><td class="paramname">chan</td><td>channel number on which to play this note [0..<a class="el" href="class_m_d___y_m2413.html#a6fee9e00e148365aa11da36865b7d4dd">countChannels()</a>-1]. </td></tr>
     <tr><td class="paramname">freq</td><td>frequency to play. </td></tr>
-    <tr><td class="paramname">vol</td><td>volume to set this note in range [VOL_MIN..VOL_MAX]. </td></tr>
+    <tr><td class="paramname">vol</td><td>volume to set this note in range [VOL_OFF..VOL_MAX]. </td></tr>
     <tr><td class="paramname">duration</td><td>length of time in ms for the whole note to last. </td></tr>
   </table>
   </dd>
@@ -691,7 +691,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>CH_BD
     <tr><td class="paramname">chan</td><td>channel number on which to play this note [0..<a class="el" href="class_m_d___y_m2413.html#a6fee9e00e148365aa11da36865b7d4dd">countChannels()</a>-1]. </td></tr>
     <tr><td class="paramname">octave</td><td>the octave block for this note [MIN_OCTAVE..MAX_OCTAVE]. </td></tr>
     <tr><td class="paramname">note</td><td>the note number to play [0..11] as defined above. </td></tr>
-    <tr><td class="paramname">vol</td><td>volume to set this note in range [VOL_MIN..VOL_MAX]. </td></tr>
+    <tr><td class="paramname">vol</td><td>volume to set this note in range [VOL_OFF..VOL_MAX]. </td></tr>
     <tr><td class="paramname">duration</td><td>length of time in ms for the whole note to last. </td></tr>
   </table>
   </dd>
@@ -760,7 +760,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>CH_BD
   <table class="params">
     <tr><td class="paramname">chan</td><td>channel number on which volume is set [0..<a class="el" href="class_m_d___y_m2413.html#a6fee9e00e148365aa11da36865b7d4dd">countChannels()</a>-1]. </td></tr>
     <tr><td class="paramname">instr</td><td>one of the instruments I_* from instrument_t. </td></tr>
-    <tr><td class="paramname">vol</td><td>volume to set for the specified channel in range [VOL_MIN..VOL_MAX]. </td></tr>
+    <tr><td class="paramname">vol</td><td>volume to set for the specified channel in range [VOL_OFF..VOL_MAX]. </td></tr>
   </table>
   </dd>
 </dl>
@@ -860,11 +860,11 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>CH_BD
       </table>
 </div><div class="memdoc">
 <p >Set the volume for a channel.</p>
-<p >Set the volume for a channel to be the value specified. Valid values are all the values in the range [VOL_MIN..VOL_MAX].</p>
+<p >Set the volume for a channel to be the value specified. Valid values are all the values in the range [VOL_OFF..VOL_MAX].</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">chan</td><td>channel number on which volume is set [0..<a class="el" href="class_m_d___y_m2413.html#a6fee9e00e148365aa11da36865b7d4dd">countChannels()</a>-1]. </td></tr>
-    <tr><td class="paramname">v</td><td>volume to set for the specified channel in range [VOL_MIN..VOL_MAX]. </td></tr>
+    <tr><td class="paramname">v</td><td>volume to set for the specified channel in range [VOL_OFF..VOL_MAX]. </td></tr>
   </table>
   </dd>
 </dl>
@@ -887,10 +887,10 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>CH_BD
       </table>
 </div><div class="memdoc">
 <p >Set the volume for all channels.</p>
-<p >Set the volume for all channels to be the specified value. Valid values are all the values in the range [VOL_MIN..VOL_MAX].</p>
+<p >Set the volume for all channels to be the specified value. Valid values are all the values in the range [VOL_OFF..VOL_MAX].</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td>volume to set for all channels in range [VOL_MIN..VOL_MAX]. </td></tr>
+    <tr><td class="paramname">v</td><td>volume to set for all channels in range [VOL_OFF..VOL_MAX]. </td></tr>
   </table>
   </dd>
 </dl>

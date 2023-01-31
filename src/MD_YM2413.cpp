@@ -5,26 +5,35 @@ See header file for copyright and licensing comments.
 */
 #include <MD_YM2413.h>
 #include <MD_YM2413_lib.h>
+#include <MD_IODriver.h>
+#include <stdio.h>
+#include <algorithm>    // std::min
 
 /**
 * \file
 * \brief Implements class definition and general methods
 */
 
+#ifdef ARDUINO
 // Class methods
-MD_YM2413::MD_YM2413(const uint8_t* D, uint8_t we, uint8_t a0):
-_D(D), _we(we), _a0(a0)
-{ }
+MD_YM2413::MD_YM2413(pin_t* D, pin_t we, pin_t a0)
+{ 
+  static IOPins defaultIO;
+  defaultIO.setPins(D, we, a0);
+  p_io = &defaultIO;
+}
+
+#endif
+
+MD_YM2413::MD_YM2413(MD_IODriver &driver)
+{
+  p_io = &driver;
+}
+
 
 void MD_YM2413::begin(void)
 {
-  // Set all pins to outputs and initialize
-  for (int8_t i = 0; i < DATA_BITS; i++)
-    pinMode(_D[i], OUTPUT);
-  pinMode(_we, OUTPUT);
-  pinMode(_a0, OUTPUT);
-
-  digitalWrite(_we, HIGH);
+  p_io->begin();
 
   // initialize the hardware defaults
   send(R_TEST_CTL_REG, 0);    // never test mode
@@ -264,7 +273,7 @@ void MD_YM2413::noteOn(uint8_t chan, uint8_t octave, uint8_t note, uint8_t vol, 
     if (octave < MIN_OCTAVE) octave = MIN_OCTAVE;
     if (octave > MAX_OCTAVE) octave = MAX_OCTAVE;
     _C[chan].octave = octave;
-    note = min(note, ARRAY_SIZE(_fNumTable)-1);   // bound it;
+    note = std::min((size_t)note,ARRAY_SIZE(_fNumTable)-1);   // bound it;
     _C[chan].fNum = pgm_read_word(&_fNumTable[note]);
     DEBUG(" -> B", _C[chan].octave);
     DEBUG(" FNum", _C[chan].fNum);

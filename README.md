@@ -12,6 +12,9 @@ Its main historical application was the generation of music and sound effects in
 
 This library implements functions that manage the sound generation interface to the YM2413 IC through a clean API encapsulating the basic functionality provided by the hardware.
 
+## Documentation
+
+The [actual documentation can be found here](https://pschatzmann.github.io/MD_YM2413/docs).
 
 ## Examples
 
